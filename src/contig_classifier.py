@@ -5,6 +5,62 @@
 # ID: 801442694
 # AI usage acknowledgment in READme file.
 
+"""
+contig_classifier.py
+
+This module provides the core functionality for validating input data,
+processing BLAST results, computing alignment coverage, and assigning
+genome contigs to biological bins based on sequence similarity evidence.
+
+Key Concepts
+------------
+- Contigs are classified into bins based on BLAST alignment evidence.
+- Coverage is computed by merging overlapping alignment intervals.
+- Only contigs meeting minimum size and coverage thresholds are considered.
+- When multiple classifications exist, a fixed priority order is applied.
+
+Parameters
+----------
+sizes_df : pd.DataFrame
+    DataFrame containing contig size information with columns:
+    - `contig_name` (str): unique contig identifier
+    - `size_bp` (int): contig length in base pairs
+
+blast_dfs : dict[str, pd.DataFrame]
+    Dictionary mapping bin labels to BLAST result DataFrames.
+    Each DataFrame must include BLAST outfmt 6 columns such as:
+    - `qseqid`, `sseqid`, `bitscore`, `evalue`, `length`,
+      `pident`, `qstart`, `qend`
+    and will be internally labeled with a `source` column.
+
+min_coverage : float, optional
+    Minimum fraction of a contig that must be covered by BLAST
+    alignments to be considered valid (default: MIN_COVERAGE = 0.01).
+    Must be between 0 and 1.
+
+min_size : int, optional
+    Minimum contig length (in base pairs) required for inclusion
+    in classification (default: MIN_SIZE = 3000).
+    Must be a positive integer.
+
+Returns
+-------
+pd.DataFrame
+    Final classification table with one row per contig meeting the
+    size threshold. Contains the following columns:
+    - `qseqid`   : contig identifier
+    - `size_bp`  : contig size in base pairs
+    - `bin`      : assigned classification category
+    - `sseqid`   : best matching subject sequence (if classified)
+    - `bitscore` : BLAST bitscore of best hit
+    - `evalue`   : BLAST e-value of best hit
+    - `pident`   : percent identity of best hit
+    - `coverage` : fraction of contig covered by alignments
+
+    Contigs with no valid BLAST hits are labeled as `"Unclassified"`
+    and will contain NaN values in hit-related columns.
+"""
+
 import os
 import sys
 import pandas as pd
