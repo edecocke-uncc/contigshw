@@ -307,7 +307,7 @@ def compute_all_coverages(blast_df: pd.DataFrame, sizes_df: pd.DataFrame) -> pd.
         Only contigs present in both ``blast_df`` and ``sizes_df`` are included.
     """
     merged = blast_df.merge(sizes_df, left_on="qseqid", right_on="contig_name", how="inner")
-    cov_series = merged.groupby("qseqid").apply(coverage_for_group)
+    cov_series = merged.groupby("qseqid", group_keys=False).apply(lambda g: coverage_for_group(g), include_groups=False)
     cov_df = cov_series.reset_index()
     cov_df.columns = ["qseqid", "coverage"]
     return cov_df
