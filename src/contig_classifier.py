@@ -3,6 +3,7 @@
 # Erin Nicole Decocker
 # edecocke@charlotte.edu
 # ID: 801442694
+# AI usage acknowledgment in READme file.
 
 import os
 import sys
