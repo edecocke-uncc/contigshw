@@ -56,7 +56,7 @@ All `--blast` inputs must be BLAST outfmt 6 TSV files with exactly 14 columns. T
 * Labels any contig with no qualifying hit as `Unclassified`
 * Writes a per-contig classification TSV and a two-panel summary bar chart
 
-bins:
+**bins:**
 | Bin                     | Meaning                                      |
 |-------------------------|----------------------------------------------|
 | Mitochondrion           | Putative mitochondrial DNA                   |
