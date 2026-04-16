@@ -49,6 +49,12 @@ All `--blast` inputs must be BLAST outfmt 6 TSV files with exactly 14 columns. T
 * Loads a contig sizes file and validates it for duplicates, nulls, and non-positive lengths
 * Loads four BLAST result files (mitochondrion, Apicomplexa, Hepatozoon, and sexual chromosome) and validates each against outfmt 6 requirements
 * Merges Hepatozoon hits into the Apicomplexa bin, since *Hepatozoon* is a genus within phylum Apicomplexa; when a contig has hits in both tables, the hit with the highest bitscore drives classification
+| Bin                     | Meaning                                      |
+|-------------------------|----------------------------------------------|
+| Mitochondrion           | Putative mitochondrial DNA                   |
+| Apicomplexa             | Putative Apicomplexa parasite sequence       |
+| Sexual Chromosome       | Putative chromosome W                        |
+| Diploid Chromosome      | Putative autosomal (nuclear, non-W) sequence |
 * Filters out contigs shorter than `--min-size` (default 3,000 bp) before classification
 * Computes per-contig alignment coverage by merging overlapping HSPs (high-scoring segment pairs) before summing aligned bases, preventing inflation from overlapping alignments
 * Applies the `--min-coverage` threshold to remove spurious short hits
