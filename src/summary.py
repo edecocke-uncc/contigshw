@@ -12,6 +12,32 @@ import matplotlib.ticker as mticker
 from matplotlib.axes import Axes
 from matplotlib.container import BarContainer
 
+"""
+This script provides utilities for summarizing, visualizing, and exporting
+genome contig classification results. It operates on a per-contig
+classification DataFrame (e.g., output from a `classify_contigs` function)
+and produces both tabular summaries and publication-ready plots.
+
+Core functionality includes:
+- Aggregating contigs into predefined biological bins
+- Computing counts and total assembly size per bin
+- Generating bar charts for contig counts and total base pairs (in Mbp)
+- Saving summary plots as a PNG file
+- Exporting the full classification table as a TSV file
+- Printing a formatted summary report to standard output
+
+Expected input:
+- A pandas DataFrame containing at minimum:
+    - `qseqid` : contig identifier
+    - `bin`    : assigned classification bin
+    - `size_bp`: contig size in base pairs
+
+Output:
+- Summary statistics per bin (counts and total Mbp)
+- Visualization file: `summary_charts.png`
+- Classification table: `classification.tsv`
+"""
+
 BINS = ["Mitochondrion", "Apicomplexa", "Sexual Chromosome", "Diploid Chromosome", "Unclassified"]
 COLORS = ["#D95F02", "#1B9E77", "#7570B3", "#E7298A", "#999999"]
 
