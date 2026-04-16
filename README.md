@@ -98,20 +98,20 @@ Two files are written to `--outdir` (default: `output/`) after each run:
 * `summary_charts.png` — side-by-side bar charts showing contig count and total assembly size (Mbp) per bin
 
 AI usage:
-# AI usage:
+### AI usage:
 I acknowledge the use of AI in completing this assignment and would like to provide a brief explanation of how I used ChatGPT as a tool to support my work.
 
-# For this assignment, I used ChatGPT in two main ways:
-# 1. Debugging and code clarification:
+### For this assignment, I used ChatGPT in two main ways:
+### 1. Debugging and code clarification:
 I used ChatGPT to help interpret warnings and troubleshoot issues that arose when running  my script, including Pandas FutureWarnings related to groupby().apply() behavior and Matplotlib warnings involving set_xticklabels(). I provided terminal output and relevant code snippets to better understand what the warnings meant and how to resolve them.
 
-# Example prompt used:
+### Example prompt used:
 “Here is the output from my script, including warnings from Pandas and Matplotlib, along with the relevant sections of my code. Can you explain what these warnings mean and what changes I should make to fix them?”
 
-# 2. Initial code scaffolding:
+### 2. Initial code scaffolding:
 I used ChatGPT to generate a high-level starting structure for the script. This included suggestions for organizing the workflow (reading BLAST files, merging with contig sizes,classifying contigs, and generating summary plots) using libraries such as Pandas, NumPy, and Matplotlib, along with argparse and docstrings.
 
-# Example prompt used:
+### Example prompt used:
 “Write a Python 3 script that reads multiple BLAST output tables (tab-separated, outfmt 6 with additional columns) and a contig sizes file. The script should classify each contig into bins based on the best hit using a priority system. Use Pandas, NumPy, and Matplotlib, and include argparse, docstrings, and type hints.”
 
 I then significantly modified and extended this scaffold by restructuring the code into modular components, implementing custom classification logic, adding quality control checks, and refining the plotting and data processing steps.
