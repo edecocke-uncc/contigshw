@@ -141,7 +141,7 @@ def plot_contig_counts(summary: pd.DataFrame, ax: Axes) -> None:
         summary["Bin"], summary["n_contigs"],
         color=COLORS, edgecolor="white", linewidth=0.8,
     )
-    ax.set_title("Contigs per bin", fontsize=13, fontweight="bold")
+    ax.set_title("Contigs per Bin", fontsize=13, fontweight="bold")
     ax.set_ylabel("Number of contigs")
     ax.set_xticks(range(len(summary["Bin"]))) 
     ax.set_xticklabels(summary["Bin"], rotation=30, ha="right")
@@ -174,8 +174,8 @@ def plot_total_bp(summary: pd.DataFrame, ax: Axes) -> None:
         summary["Bin"], summary["total_mbp"],
         color=COLORS, edgecolor="white", linewidth=0.8,
     )
-    ax.set_title("Total assembly size per bin", fontsize=13, fontweight="bold")
-    ax.set_ylabel("Total base pairs (Mbp)")
+    ax.set_title("Assembly Size per Bin", fontsize=13, fontweight="bold")
+    ax.set_ylabel("Base pairs (Mbp)")
     ax.set_xticks(range(len(summary["Bin"]))) 
     ax.set_xticklabels(summary["Bin"], rotation=30, ha="right")
     annotate_bars(ax, bars, summary["total_mbp"], "{:.1f}")
