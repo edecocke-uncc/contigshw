@@ -26,12 +26,12 @@ conda activate contigshw
 
 ```
 python3 src/main.py \
-  --sizes    contigs.txt \
-  --mito     blast_mito.tsv \
-  --apicomplexa blast_apicomplexa.tsv \
-  --hepatozoon  blast_hepatozoon.tsv \
-  --sexual   blast_sexual.tsv \
-  --outdir   output/
+  --sizes Binsularis_contig_sizes.txt \
+  --mito Binsularis_BLAST_Mitochondrion.tsv \
+  --apicomplexa Binsularis_BLAST_Apicomplexa.tsv \
+  --hepatozoon Binsularis_BLAST_Hepatozoon.tsv \
+  --sexual Binsularis_BLAST_SexualChromosome.tsv \
+  --outdir output/
 ```
 
 All `--blast` inputs must be BLAST outfmt 6 TSV files with exactly 14 columns. The sizes file is a two-column whitespace-separated file with no header: contig name followed by length in base pairs.
