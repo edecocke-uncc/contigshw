@@ -1,0 +1,186 @@
+import os
+import sys
+import pandas as pd
+import numpy as np
+
+BLAST_COLS = [
+    "qseqid", "staxids", "bitscore", "qseqid2", "sseqid",
+    "pident", "length", "mismatch", "gapopen",
+    "qstart", "qend", "sstart", "send", "evalue",
+]
+
+PRIORITY_ORDER = ["Mitochondrion", "Apicomplexa", "Sexual Chromosome", "Diploid Chromosome"]
+MIN_SIZE = 3000
+MIN_COVERAGE = 0.01
+
+
+def validate_file_exists(path):
+    if not path.endswith(".tsv") and "BLAST" in os.path.basename(path):
+        print(f"[WARNING] Expected .tsv extension for BLAST file: {path}")
+    if not os.path.exists(path):
+        sys.exit(f"[ERROR] File does not exist: {path}")
+    if not os.access(path, os.R_OK):
+        sys.exit(f"[ERROR] File is not readable: {path}")
+    if os.path.getsize(path) == 0:
+        sys.exit(f"[ERROR] File is empty: {path}")
+    return
+
+
+def validate_outfmt6(df, path):
+    if df.shape[1] != 14:
+        sys.exit(
+            f"[ERROR] {path} has {df.shape[1]} columns; outfmt6 requires exactly 14."
+        )
+    required = ["qseqid", "sseqid", "bitscore", "evalue", "length", "pident", "qstart", "qend"]
+    missing = [c for c in required if c not in df.columns]
+    if missing:
+        sys.exit(f"[ERROR] {path} is missing required outfmt6 columns: {missing}")
+    if df["qseqid"].isnull().any():
+        sys.exit(f"[ERROR] Null query identifiers (qseqid) found in {path}")
+    if df["sseqid"].isnull().any():
+        sys.exit(f"[ERROR] Null subject identifiers (sseqid) found in {path}")
+    if df["bitscore"].isnull().all():
+        sys.exit(f"[ERROR] All bitscore values are null in {path}")
+    if df["evalue"].isnull().all():
+        sys.exit(f"[ERROR] All evalue values are null in {path}")
+    if df["length"].isnull().all():
+        sys.exit(f"[ERROR] All alignment length values are null in {path}")
+    return
+
+
+def check_shared_ids(blast_dfs, sizes_df):
+    size_ids = set(sizes_df["contig_name"])
+    for label, df in blast_dfs.items():
+        blast_ids = set(df["qseqid"])
+        shared = blast_ids & size_ids
+        if len(shared) == 0:
+            sys.exit(
+                f"[ERROR] No shared contig IDs between '{label}' BLAST results and sizes file. "
+                "Check that the correct files were provided."
+            )
+        not_found = blast_ids - size_ids
+        print(f"[QC] {label}: {len(shared)} shared IDs | {len(not_found)} query IDs not in sizes file.")
+    return
+
+
+def validate_sizes(df):
+    if df["contig_name"].isnull().any():
+        sys.exit("[ERROR] Null contig identifiers found in sizes file.")
+    if df["contig_name"].duplicated().any():
+        dupes = df[df["contig_name"].duplicated()]["contig_name"].tolist()
+        sys.exit(f"[ERROR] Duplicate contig names in sizes file: {dupes[:5]}")
+    if df["size_bp"].isnull().any():
+        sys.exit("[ERROR] Null size values found in sizes file.")
+    if (df["size_bp"] <= 0).any():
+        sys.exit("[ERROR] Non-positive contig sizes found in sizes file.")
+    return
+
+
+def load_sizes(path):
+    validate_file_exists(path)
+    df = pd.read_csv(path, sep=r"\s+", header=None, names=["contig_name", "size_bp"])
+    validate_sizes(df)
+    print(f"[QC] Sizes file: {len(df)} contigs loaded from {path}")
+    return df
+
+
+def load_blast(path, label):
+    validate_file_exists(path)
+    df = pd.read_csv(path, sep="\t", header=None, names=BLAST_COLS)
+    validate_outfmt6(df, path)
+    df = df.drop(columns=["qseqid2"])
+    df["qstart"], df["qend"] = (
+        np.minimum(df["qstart"], df["qend"]),
+        np.maximum(df["qstart"], df["qend"]),
+    )
+    df["source"] = label
+    print(f"[QC] {label}: {len(df)} BLAST hits loaded from {path}")
+    return df
+
+
+def merge_intervals(intervals):
+    if not intervals:
+        return []
+    sorted_iv = sorted(intervals, key=lambda x: x[0])
+    merged = [list(sorted_iv[0])]
+    for start, end in sorted_iv[1:]:
+        if start <= merged[-1][1]:
+            merged[-1][1] = max(merged[-1][1], end)
+        else:
+            merged.append([start, end])
+    return merged
+
+
+def coverage_for_group(group):
+    size = group["size_bp"].iloc[0]
+    intervals = list(zip(group["qstart"].tolist(), group["qend"].tolist()))
+    merged = merge_intervals(intervals)
+    aligned_bp = sum(e - s + 1 for s, e in merged)
+    return float(aligned_bp) / size if size > 0 else 0.0
+
+
+def compute_all_coverages(blast_df, sizes_df):
+    merged = blast_df.merge(sizes_df, left_on="qseqid", right_on="contig_name", how="inner")
+    cov_series = merged.groupby("qseqid").apply(coverage_for_group)
+    cov_df = cov_series.reset_index()
+    cov_df.columns = ["qseqid", "coverage"]
+    return cov_df
+
+
+def get_best_hit_per_contig(df):
+    return (
+        df.sort_values("bitscore", ascending=False)
+        .drop_duplicates(subset="qseqid")
+        .reset_index(drop=True)
+    )
+
+
+def build_candidate_table(blast_dfs, sizes_df, min_coverage):
+    frames = []
+    for label, df in blast_dfs.items():
+        cov_df = compute_all_coverages(df, sizes_df)
+        df2 = df.merge(cov_df, on="qseqid")
+        df2 = df2[df2["coverage"] >= min_coverage].copy()
+        df2["bin"] = label
+        frames.append(df2)
+    if not frames:
+        empty_cols = ["qseqid", "bin", "sseqid", "bitscore", "evalue", "pident", "coverage"]
+        return pd.DataFrame(columns=empty_cols)
+    return pd.concat(frames, ignore_index=True)
+
+
+def apply_priority_and_best_hit(candidates):
+    priority_map = {b: i for i, b in enumerate(PRIORITY_ORDER)}
+    candidates = candidates.copy()
+    candidates["priority"] = candidates["bin"].map(priority_map)
+    candidates = candidates.sort_values(
+        ["qseqid", "priority", "bitscore"],
+        ascending=[True, True, False],
+    )
+    best = candidates.drop_duplicates(subset="qseqid", keep="first")
+    keep_cols = ["qseqid", "bin", "sseqid", "bitscore", "evalue", "pident", "coverage"]
+    return best[keep_cols].reset_index(drop=True)
+
+
+def classify_contigs(sizes_df, blast_dfs, min_coverage=MIN_COVERAGE, min_size=MIN_SIZE):
+    if min_coverage < 0 or min_coverage > 1:
+        sys.exit(f"[ERROR] --min-coverage must be between 0 and 1, got {min_coverage}")
+    if min_size <= 0:
+        sys.exit(f"[ERROR] --min-size must be a positive integer, got {min_size}")
+
+    eligible = sizes_df[sizes_df["size_bp"] >= min_size].copy()
+    print(f"[INFO] {len(eligible)} contigs >= {min_size} bp retained for classification.")
+
+    candidates = build_candidate_table(blast_dfs, eligible, min_coverage)
+    base = eligible[["contig_name", "size_bp"]].rename(columns={"contig_name": "qseqid"})
+
+    if candidates.empty:
+        base["bin"] = "Unclassified"
+        for col in ["sseqid", "bitscore", "evalue", "pident", "coverage"]:
+            base[col] = np.nan
+        return base
+
+    best = apply_priority_and_best_hit(candidates)
+    final = base.merge(best, on="qseqid", how="left")
+    final["bin"] = final["bin"].fillna("Unclassified")
+    return final
