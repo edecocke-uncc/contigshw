@@ -42,7 +42,7 @@ from matplotlib.container import BarContainer
 
 
 BINS = ["Mitochondrion", "Apicomplexa", "Sexual Chromosome", "Diploid Chromosome", "Unclassified"]
-COLORS = ["#D95F02", "#1B9E77", "#7570B3", "#E7298A", "#999999"]
+COLORS = ["#D95F02", "#1B9E77", "#00CECE", "#E7298A", "#CE0000"]
 
 
 def compute_summary(df: pd.DataFrame) -> pd.DataFrame:
