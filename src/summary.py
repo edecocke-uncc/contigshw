@@ -5,14 +5,9 @@
 # ID: 801442694
 # AI usage acknowledgment in READme file.
 
-import os
-import pandas as pd
-import matplotlib.pyplot as plt
-import matplotlib.ticker as mticker
-from matplotlib.axes import Axes
-from matplotlib.container import BarContainer
-
 """
+summary.py
+
 This script provides utilities for summarizing, visualizing, and exporting
 genome contig classification results. It operates on a per-contig
 classification DataFrame (e.g., output from a `classify_contigs` function)
@@ -37,6 +32,14 @@ Output:
 - Visualization file: `summary_charts.png`
 - Classification table: `classification.tsv`
 """
+
+import os
+import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
+from matplotlib.axes import Axes
+from matplotlib.container import BarContainer
+
 
 BINS = ["Mitochondrion", "Apicomplexa", "Sexual Chromosome", "Diploid Chromosome", "Unclassified"]
 COLORS = ["#D95F02", "#1B9E77", "#7570B3", "#E7298A", "#999999"]
