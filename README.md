@@ -1,5 +1,5 @@
 
-# contigshw# contigshw
+# contigshw
 
 A Python pipeline that classifies contigs from a draft genome assembly into biological bins — Mitochondrion, Apicomplexa, Sexual Chromosome, Diploid Chromosome, or Unclassified — using BLAST tabular output against multiple reference databases.
 
