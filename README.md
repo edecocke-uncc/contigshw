@@ -25,7 +25,7 @@ conda activate contigshw
 ## Run
 
 ```
-python3 src.main \
+python3 src.main.py \
   --sizes    contigs.txt \
   --mito     blast_mito.tsv \
   --apicomplexa blast_apicomplexa.tsv \
