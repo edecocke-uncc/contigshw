@@ -5,6 +5,63 @@
 # ID: 801442694
 # AI usage acknowledgment in READme file.
 
+"""
+main.py
+
+This script serves as the command-line interface (CLI) for a genome contig
+classification pipeline. It orchestrates loading input data, performing
+classification, generating summary statistics, and exporting results. 
+
+The pipeline integrates contig size data with BLAST alignment results against
+multiple reference databases to assign each contig to a biological category.
+
+Workflow:
+1. Parse command-line arguments
+2. Load contig sizes and BLAST result files
+3. Validate consistency of contig IDs across inputs
+4. Classify contigs based on alignment coverage and size thresholds
+5. Compute summary statistics per classification bin
+6. Print a formatted summary report
+7. Save the classification table (TSV)
+8. Generate and save summary plots (PNG)
+
+Parameters (via command-line arguments)
+--------------------------------------
+--sizes : str
+    Path to contig sizes file (.txt). Must include contig identifiers and sizes in base pairs.
+
+--mito : str
+    Path to BLAST results against mitochondrial database (.tsv).
+
+--apicomplexa : str
+    Path to BLAST results against Apicomplexa database (.tsv).
+
+--hepatozoon : str
+    Path to BLAST results against Hepatozoon database (.tsv).
+    These hits are merged into the Apicomplexa classification bin.
+
+--sexual : str
+    Path to BLAST results against sexual chromosome database (.tsv).
+
+--outdir : str, optional
+    Output directory for generated files (default: "output/").
+    Created if it does not exist.
+
+--min-coverage : float, optional
+    Minimum alignment coverage fraction required to consider a BLAST hit
+    valid (default: MIN_COVERAGE imported from contig_classifier).
+
+--min-size : int, optional
+    Minimum contig size (in base pairs) required for inclusion in the
+    analysis (default: MIN_SIZE imported from contig_classifier).
+
+Returns
+-------
+None
+    This script is executed for its side effects. It does not return values
+"""
+
+
 import argparse
 import pandas as pd
 
