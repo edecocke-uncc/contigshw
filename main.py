@@ -17,7 +17,25 @@ from summary import (
 )
 
 
-def parse_args():
+def parse_args() -> argparse.Namespace:
+    """
+    Parse command-line arguments for the contig classification pipeline.
+
+    Parameters
+    ----------
+    None
+
+    Ensures
+    -------
+    None
+
+    Returns
+    -------
+    argparse.Namespace
+        Parsed argument object with attributes ``sizes``, ``mito``,
+        ``apicomplexa``, ``hepatozoon``, ``sexual``, ``outdir``,
+        ``min_coverage``, and ``min_size``.
+    """
     parser = argparse.ArgumentParser(
         description="Bin contigs from a draft genome assembly into biological categories."
     )
@@ -38,7 +56,28 @@ def parse_args():
     return parser.parse_args()
 
 
-def load_all_blast(args):
+def load_all_blast(args: argparse.Namespace) -> dict[str, pd.DataFrame]:
+    """
+    Load all four BLAST result files and merge Hepatozoon hits into the Apicomplexa bin.
+
+    Parameters
+    ----------
+    args : argparse.Namespace
+        Parsed command-line arguments. Must have attributes ``mito``,
+        ``apicomplexa``, ``hepatozoon``, and ``sexual`` pointing to
+        valid BLAST TSV files.
+
+    Ensures
+    -------
+    None
+
+    Returns
+    -------
+    dict[str, pd.DataFrame]
+        Mapping of bin label to BLAST DataFrame with keys
+        ``"Mitochondrion"``, ``"Apicomplexa"``, and ``"Sexual Chromosome"``.
+        Hepatozoon hits are concatenated into the ``"Apicomplexa"`` entry.
+    """
     mito_df = load_blast(args.mito,        "Mitochondrion")
     api_df  = load_blast(args.apicomplexa, "Apicomplexa")
     hep_df  = load_blast(args.hepatozoon,  "Apicomplexa")
@@ -51,7 +90,24 @@ def load_all_blast(args):
     return blast_dfs
 
 
-def run_pipeline(args):
+def run_pipeline(args: argparse.Namespace) -> None:
+    """
+    Execute the full contig classification pipeline end-to-end.
+
+    Parameters
+    ----------
+    args : argparse.Namespace
+        Parsed command-line arguments containing all input file paths,
+        output directory, and filtering thresholds.
+
+    Ensures
+    -------
+    None
+
+    Returns
+    -------
+    None
+    """
     sizes_df  = load_sizes(args.sizes)
     blast_dfs = load_all_blast(args)
     check_shared_ids(blast_dfs, sizes_df)
@@ -70,7 +126,22 @@ def run_pipeline(args):
     return
 
 
-def main():
+def main() -> None:
+    """
+    Entry point for the contigshw classification pipeline.
+
+    Parameters
+    ----------
+    None
+
+    Ensures
+    -------
+    None
+
+    Returns
+    -------
+    None
+    """
     args = parse_args()
     run_pipeline(args)
     return
