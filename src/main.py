@@ -1,7 +1,7 @@
 import argparse
 import pandas as pd
 
-from contig_classifier import (
+from src.contig_classifier import (
     load_sizes,
     load_blast,
     check_shared_ids,
@@ -9,7 +9,7 @@ from contig_classifier import (
     MIN_COVERAGE,
     MIN_SIZE,
 )
-from summary import (
+from src.summary import (
     compute_summary,
     save_charts,
     save_classification_table,
