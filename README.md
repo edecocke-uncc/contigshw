@@ -30,7 +30,7 @@ python3 src/main.py \
   --mito data/Binsularis_BLAST_Mitochondrion.tsv \
   --apicomplexa data/Binsularis_BLAST_Apicomplexa.tsv \
   --hepatozoon data/Binsularis_BLAST_Hepatozoon.tsv \
-  --sexual data/Binsularis_BLAST_SexualChromosome.tsv \
+  --sexual data/Binsularis_BLAST_SexualChromosomes.tsv \
   --outdir output/
 ```
 
