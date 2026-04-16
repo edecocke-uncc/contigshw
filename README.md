@@ -26,11 +26,11 @@ conda activate contigshw
 
 ```
 python3 src/main.py \
-  --sizes Binsularis_contig_sizes.txt \
-  --mito Binsularis_BLAST_Mitochondrion.tsv \
-  --apicomplexa Binsularis_BLAST_Apicomplexa.tsv \
-  --hepatozoon Binsularis_BLAST_Hepatozoon.tsv \
-  --sexual Binsularis_BLAST_SexualChromosome.tsv \
+  --sizes data/Binsularis_contig_sizes.txt \
+  --mito data/Binsularis_BLAST_Mitochondrion.tsv \
+  --apicomplexa data/Binsularis_BLAST_Apicomplexa.tsv \
+  --hepatozoon data/Binsularis_BLAST_Hepatozoon.tsv \
+  --sexual data/Binsularis_BLAST_SexualChromosome.tsv \
   --outdir output/
 ```
 
